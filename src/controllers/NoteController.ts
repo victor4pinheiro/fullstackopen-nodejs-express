@@ -27,6 +27,24 @@ class PersonController {
     return "name" in object && "number" in object;
   }
 
+  create(request: Request, response: Response) {
+    const body = request.body;
+
+    if (!PersonController.isPerson(body))
+      return response.status(404).json({ error: "Missing name or number" });
+
+    if (PersonController.newPersons.find((person) => person.name === body.name))
+      return response.status(409).json({ error: "Person already exists" });
+
+    const person = {
+      id: PersonController.generateMaxIds(),
+      ...body,
+    };
+
+    PersonController.newPersons = persons.concat(person);
+    return response.status(201).json(person);
+  }
+
   getAll(request: Request, response: Response) {
     if (PersonController.newPersons)
       return response.status(200).json(PersonController.newPersons);
@@ -39,8 +57,8 @@ class PersonController {
       (person) => person.id === id
     );
 
-    if (person) response.json(person);
-    response.status(404).send("No person found");
+    if (person) return response.json(person);
+    return response.status(404).json({ error: "No person found" });
   }
 
   getInfo(request: Request, response: Response) {
@@ -50,37 +68,21 @@ class PersonController {
     );
   }
 
-  create(request: Request, response: Response) {
-    const body = request.body;
-
-    if (!PersonController.isPerson(body))
-      response.status(404).send("Name or number is missing");
-
-    const person = {
-      id: PersonController.generateMaxIds(),
-      ...body,
-    };
-
-    PersonController.newPersons = persons.concat(person);
-    response.status(201).json(PersonController.newPersons);
-  }
-
   delete(request: Request, response: Response) {
     const id = Number(request.params.id);
 
     if (!PersonController.newPersons.some((person) => person.id === id))
-      response.status(404).send("No person found");
+      return response.status(404).json({ error: "No person found" });
 
     const newPersons = PersonController.newPersons.filter(
       (person) => person.id !== id
     );
 
-    if (PersonController.newPersons.length === newPersons.length) {
-      response.status(404).send("Deletion not succeeded");
-    }
+    if (PersonController.newPersons.length === newPersons.length)
+      return response.status(404).json({ error: "Deletion not succeeded" });
 
     PersonController.newPersons = newPersons;
-    response.json(PersonController.newPersons);
+    return response.status(200).end();
   }
 }
 
