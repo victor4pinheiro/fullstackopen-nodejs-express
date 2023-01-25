@@ -9,6 +9,7 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 app.use(router);
+app.use(express.static("build"));
 app.use(cors);
 
 morgan.token("body", function (request) {
