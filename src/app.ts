@@ -1,4 +1,5 @@
 import express from "express";
+require("dotenv").config();
 import { router } from "./routes";
 import cors from "cors";
 import morgan from "morgan";
