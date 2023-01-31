@@ -1,9 +1,11 @@
 import express from "express";
-require("dotenv").config();
+import dotenv from "dotenv";
 import { router } from "./routes";
 import cors from "cors";
 import morgan from "morgan";
 import handleError from "./middleware/errors";
+
+dotenv.config();
 const app = express();
 
 app.use(express.json());
