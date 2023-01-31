@@ -7,8 +7,10 @@ export default function handleError(
   response: Response,
   next: NextFunction
 ) {
-  const status = error.status || 500;
+  const status = error.status || 400;
   const message = error.message || "Something went wrong";
+
+  console.log(`Error ${status} - ${message}`);
   return response.status(status).send({
     status,
     message,
