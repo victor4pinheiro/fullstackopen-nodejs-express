@@ -4,25 +4,13 @@ import Database from "../database/database";
 import CustomError from "../model/errors";
 import Person from "../model/person";
 
-interface PersonInterface {
-  name: string;
-  number: string;
-}
-
 class PersonController {
-  static isPerson(object: any | PersonInterface): object is PersonInterface {
-    return "name" in object && "number" in object;
-  }
-
   async countPeople() {
     return await Person.find().countDocuments();
   }
 
   create(request: Request, response: Response, next: NextFunction) {
     const body = request.body;
-
-    if (!PersonController.isPerson(body))
-      next(new CustomError("missing name or number", 404));
 
     const person = new Person({
       ...body,
@@ -80,10 +68,6 @@ class PersonController {
 
   update(request: Request, response: Response, next: NextFunction) {
     const body = request.body;
-
-    if (!PersonController.isPerson(body))
-      next(new CustomError("missing name or number", 404));
-
     const id = request.params.id;
 
     const person = new Person({
@@ -93,7 +77,11 @@ class PersonController {
 
     Database.connect()
       .then(() => {
-        Person.findByIdAndUpdate(id, person)
+        Person.findByIdAndUpdate(id, person, {
+          new: true,
+          runValidators: true,
+          context: "query",
+        })
           .then((person) =>
             person
               ? response.status(200).json(person)
