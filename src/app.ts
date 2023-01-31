@@ -3,6 +3,7 @@ require("dotenv").config();
 import { router } from "./routes";
 import cors from "cors";
 import morgan from "morgan";
+import handleError from "./middleware/errors";
 const app = express();
 
 app.use(express.json());
@@ -16,5 +17,7 @@ app.use(cors);
 morgan.token("body", function (request) {
   return JSON.stringify(request["body"]);
 });
+
+app.use(handleError);
 
 export { app };
