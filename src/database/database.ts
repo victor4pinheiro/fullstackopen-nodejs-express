@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
 
-const url = process.env.MONGODB_URI;
-
 class Database {
   static async connect() {
+    const url = process.env.MONGODB_URI;
     const client = await mongoose.connect(url);
     return client.connection;
   }
